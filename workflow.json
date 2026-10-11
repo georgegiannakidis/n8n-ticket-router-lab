@@ -1,0 +1,302 @@
+{
+  "name": "Ticket router",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ticket",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f616e555-be2c-4736-9ca6-4fda7edf643e",
+      "name": "Webhook",
+      "webhookId": "21a92f0d-b5fb-44ac-b975-a487f34948c2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9cf541e0-bd49-4db2-bd98-615b5852b882",
+              "leftValue": "={{ $json.body.hotel }}",
+              "rightValue": "Hotel Alpha",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "301ae577-129f-4dc9-be68-bf33767c0b79",
+              "leftValue": "={{ $json.body.hotel }}",
+              "rightValue": "Hotel Beta",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        0
+      ],
+      "id": "b4a45fd2-e8c1-4dab-b0a4-21534a26fd7c",
+      "name": "Key account?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f91e52a3-ffa8-4f23-b134-e78d8cc8b193",
+              "name": "priority",
+              "value": "High",
+              "type": "string"
+            },
+            {
+              "id": "9e3d598e-5685-405f-878f-475064f5a977",
+              "name": "owner",
+              "value": "Dedicated Technical Contact",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        -96
+      ],
+      "id": "6761a69b-b65f-475c-9222-8a972efd5a8c",
+      "name": "High priority and owner"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook').item.json.body.subject }}",
+                    "rightValue": "channel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "95a80d17-b83e-4243-b7e7-81881287a587"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Channel"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f2bc1aac-3882-4f80-bde3-a992a434409e",
+                    "leftValue": "={{ $('Webhook').item.json.body.subject }}",
+                    "rightValue": "rates",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Rates"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        96
+      ],
+      "id": "b1b77076-dda5-498d-b6fa-283df49c5bfe",
+      "name": "Route by keyword"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b5be7d7a-8895-483a-91ed-10678ac2bc4f",
+              "name": "queue",
+              "value": "Channel setup",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        672,
+        -16
+      ],
+      "id": "e51fc7c6-56f1-4dfb-b0c8-8629ebd7cfb9",
+      "name": "Queue Channel setup"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a9a0dc5d-7637-42e8-a059-61cfef25f0a7",
+              "name": "queue",
+              "value": "Rates and availability",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        688,
+        176
+      ],
+      "id": "07233b71-1a34-467c-b684-b629d9b18341",
+      "name": "Queue Rates"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e269928d-4de7-40d2-9a96-79cac723e58b",
+              "name": "queue",
+              "value": "General",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        688,
+        368
+      ],
+      "id": "1536c7e3-b1b0-4a32-b400-c01685c0d9be",
+      "name": "Queue General"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Key account?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Key account?": {
+      "main": [
+        [
+          {
+            "node": "High priority and owner",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Route by keyword",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by keyword": {
+      "main": [
+        [
+          {
+            "node": "Queue Channel setup",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Queue Rates",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Queue General",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "42fea7e1-b1df-46a1-919b-748613969b1a",
+  "meta": {
+    "instanceId": "7664a6c16aea94d0816c26fa881872d49c7e1cf0c994186d61b4767b19299513"
+  },
+  "nodeGroups": [],
+  "id": "drbhyYf2j3lHMBXv",
+  "tags": []
+}
